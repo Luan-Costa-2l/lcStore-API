@@ -1,8 +1,10 @@
 import { Request, Response } from "express";
 import Ad from '../models/Ad';
+import Category from "../models/Category";
 
 export const getCategories = async (req: Request, res: Response) => {
-    res.json({ categories: 'ok' });
+    const categories = await Category.find();
+    res.json({ categories });
 }
 
 export const getList = async (req: Request, res: Response) => {
