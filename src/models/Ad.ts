@@ -1,10 +1,12 @@
 import mongoose, { Schema, Types } from "mongoose";
 
+type Image = {name: String; default: Boolean}
 export interface AdInstance {
+    _id: Types.ObjectId;
     userId: Types.ObjectId;
     state: string;
     category: string;
-    images: object[];
+    images: Image[];
     dateCreated: Date;
     title: string;
     price: number;
@@ -37,4 +39,4 @@ if(mongoose.connection && mongoose.connection.models[modelName]) {
     Ad = mongoose.model<AdInstance>(modelName, AdSchema);
 }
 
-export default Ad as mongoose.Model<AdInstance,  {_id: Types.ObjectId}>;
+export default Ad as mongoose.Model<AdInstance>;

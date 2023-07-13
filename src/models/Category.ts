@@ -1,6 +1,7 @@
 import mongoose, { Schema, Types } from "mongoose";
 
-interface CategoryInstance {
+export interface CategoryInstance {
+    _id: Types.ObjectId;
     name: string;
     slug: string;
 }
@@ -11,13 +12,13 @@ const CategorySchema = new Schema<CategoryInstance>({
 });
 
 const modelName = 'Category';
-let Category
+let Category;
 
 
 if(mongoose.connection && mongoose.connection.models[modelName]) {
-    Category = module.exports = mongoose.connection.models[modelName];
+    Category = mongoose.connection.models[modelName];
 } else {
-    Category = module.exports = mongoose.model(modelName, CategorySchema);
+    Category = mongoose.model(modelName, CategorySchema);
 }
 
-export default Category as mongoose.Model<CategoryInstance,  {_id: Types.ObjectId}>;
+export default Category as mongoose.Model<CategoryInstance>;

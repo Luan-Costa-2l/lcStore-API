@@ -1,6 +1,7 @@
 import mongoose, { Schema, Types } from "mongoose";
 
-interface StateInstance {
+export interface StateInstance {
+    _id: Types.ObjectId;
     name: string;
 }
 

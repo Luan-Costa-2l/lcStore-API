@@ -1,6 +1,7 @@
 import mongoose, { Schema, Types } from "mongoose";
 
-interface UserInstance {
+export interface UserInstance {
+    _id: Types.ObjectId;
     name: string;
     email: string;
     state: string;
@@ -26,4 +27,4 @@ if(mongoose.connection && mongoose.connection.models[modelName]) {
     User = module.exports = mongoose.model<UserInstance>(modelName, UserSchema);
 }
 
-export default User as mongoose.Model<UserInstance,  {_id: Types.ObjectId}>;
+export default User as mongoose.Model<UserInstance>;
