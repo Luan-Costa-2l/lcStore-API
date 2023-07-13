@@ -2,6 +2,7 @@ import express from 'express';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import cors from 'cors';
+import path from 'path';
 import mainRoutes from './routes/api'
 dotenv.config();
 
@@ -10,6 +11,7 @@ mongoose.connect(process.env.NODE_DATABASE as string).catch(error => console.log
 const app = express();
 
 app.use(cors());
+app.use(express.static(path.join(__dirname, '../public')));
 
 app.use(mainRoutes);
 
