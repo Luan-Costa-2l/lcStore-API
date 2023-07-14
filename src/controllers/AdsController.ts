@@ -1,7 +1,11 @@
 import { Request, Response } from "express";
+import { isValidObjectId } from "mongoose";
+import dotenv from 'dotenv';
 import Ad, { AdInstance } from '../models/Ad';
 import Category, { CategoryInstance } from "../models/Category";
 import State from "../models/State";
+import User from "../models/User";
+dotenv.config();
 
 export const getCategories = async (req: Request, res: Response) => {
     const categories = await Category.find();
@@ -74,7 +78,76 @@ export const addAction = async (req: Request, res: Response) => {
 }
 
 export const getItem = async (req: Request, res: Response) => {
-    res.json({ getItem: req.params.id });
+    const { id } = req.params;
+    const { other = null } = req.query;
+
+    if (!id) {
+        res.json({ error: "Sem produto" });
+        return;
+    }
+
+    if (!isValidObjectId(id) && id.length < 12) {
+        res.json({ error: "Id inválido." });
+        return;
+    }
+
+    const ad = await Ad.findById(id);
+
+    if (!ad) {
+        res.status(404);
+        res.json({ error: "Nenhum anúncio encontrado." });
+        return;
+    }
+
+    ad.views++;
+    await ad.save();
+
+    const images = ad.images.map(image => `${process.env.NODE_BASE}/media/${image.name}.png`);
+
+    const userInfo = await User.findById(ad.userId).exec();
+    const stateInfo = await State.findById(ad.state).exec();
+    const category = await Category.findById(ad.category).exec();
+
+    let others: {id: string, title: string, price: number, priceNegotiable: boolean, image: string}[] = [];
+    if (other) {
+        const otherAds = await Ad.find({ status: true, userId: ad.userId }).exec();
+
+        otherAds.forEach(otherAd => {
+            if (otherAd._id.toString() != ad._id.toString()) {
+                let image = `${process.env.NODE_BASE}/media/default.png`;
+                const defaultImage = otherAd.images.find(image => image.default);
+                if (defaultImage) {
+                    image = `${process.env.NODE_BASE}/media/${defaultImage.name}.png`;
+                }
+                others.push({
+                    id: otherAd._id.toString(),
+                    title: otherAd.title,
+                    price: otherAd.price,
+                    priceNegotiable: otherAd.priceNegotiable,
+                    image
+                });
+            }
+        });
+    }
+
+    res.status(200);
+    res.json({
+        id: ad._id.toString(),
+        title: ad.title,
+        price: ad.price,
+        priceNegotiable: ad.priceNegotiable,
+        description: ad.description,
+        dateCreated: ad.dateCreated,
+        views: ad.views,
+        stateName: stateInfo?.name,
+        category,
+        images,
+        userInfo: {
+            name: userInfo?.name,
+            email: userInfo?.email
+        },
+        others,
+    });
 }
 
 export const editAction = async (req: Request, res: Response) => {
