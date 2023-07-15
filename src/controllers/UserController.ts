@@ -6,14 +6,6 @@ export const getStates = async (req: Request, res: Response) => {
     res.json({ states });
 }
 
-export const signin = async (req: Request, res: Response) => {
-    res.json({ signin: 'ok' });
-}
-
-export const signup = async (req: Request, res: Response) => {
-    res.json({ signup: 'ok' });
-}
-
 export const info = async (req: Request, res: Response) => {
     res.json({ info: 'ok' });
 }
