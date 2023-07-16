@@ -1,6 +1,9 @@
 import { Router } from "express";
 import * as UserController from '../controllers/UserController'
 import * as AdsController from '../controllers/AdsController';
+import * as AuthController from '../controllers/AuthController';
+
+import * as AuthValidator from '../validators/AuthValidator';
 
 const router = Router();
 
@@ -12,8 +15,8 @@ router.get('/ping', (req, res) => {
 
 router.get('/states', UserController.getStates);
 
-router.post('/user/login', UserController.signin);
-router.post('/user/signup', UserController.signup);
+router.post('/user/login', AuthController.signin);
+router.post('/user/signup', AuthValidator.signup, AuthController.signup);
 
 router.get('/user/me', UserController.info); // should be private
 router.put('/user/me', UserController.editAction); // should be private
