@@ -15,7 +15,7 @@ router.get('/ping', (req, res) => {
 
 router.get('/states', UserController.getStates);
 
-router.post('/user/login', AuthController.signin);
+router.post('/user/login', AuthValidator.signin, AuthController.signin);
 router.post('/user/signup', AuthValidator.signup, AuthController.signup);
 
 router.get('/user/me', UserController.info); // should be private

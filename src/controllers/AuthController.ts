@@ -6,7 +6,40 @@ import User from '../models/User';
 import State from '../models/State';
 
 export const signin = async (req: Request, res: Response) => {
-    
+    const errors = validationResult(req);
+    if(!errors.isEmpty()) {
+        res.json({ error: errors.mapped() });
+        return;
+    }
+
+    const { email, password } = matchedData(req);
+
+    const user = await User.findOne({ email });
+
+    if (!user) {
+        res.json({
+            error: { login: { msg: "E-mail e/ou senha errados."} }
+        })
+        return;
+    }
+
+    const matchPassword = await bcrypt.compare(password, user.passwordHash);
+
+    if (!matchPassword) {
+        res.json({
+            error: { login: { msg: "E-mail e/ou senha errados."} }
+        })
+        return;
+    }
+
+    const saltRounds = 12;
+    const payload = (Date.now() + Math.random()).toString();
+    const token = await bcrypt.hash(payload, saltRounds);
+
+    user.token = token;
+    await user.save();
+
+    res.json({ token, email });
 }
 
 export const signup = async (req: Request, res: Response) => {

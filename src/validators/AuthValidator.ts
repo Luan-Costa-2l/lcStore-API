@@ -1,5 +1,26 @@
 import { checkSchema } from 'express-validator';
 
+export const signin = checkSchema({
+    email: {
+        notEmpty: {
+            errorMessage: "O campo e-mail não pode estar vazio."
+        },
+        isEmail: {
+            errorMessage: "Formato de e-mail inválido."
+        },
+        normalizeEmail: true
+    },
+    password: {
+        notEmpty: {
+            errorMessage: "O campo senha não pode estar vazio."
+        },
+        isLength: {
+            options: { min: 4 },
+            errorMessage: "Senha precisa ter pelo menos 4 caracteres."
+        }
+    }
+});
+
 export const signup = checkSchema({
     name: {
         trim: true,
