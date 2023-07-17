@@ -56,3 +56,11 @@ export const signup = checkSchema({
         }
     }
 });
+
+export const info = checkSchema({
+    token: {
+        notEmpty: {
+            errorMessage: "O usuário não está logado."
+        }
+    }
+})
