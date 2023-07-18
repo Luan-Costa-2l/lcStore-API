@@ -3,13 +3,17 @@ import { validationResult, matchedData } from 'express-validator';
 import User from "../models/User";
 
 export const privateRoute = async (req: Request, res: Response, next: NextFunction) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-        res.status(401)
+    if (!req.query.token && !req.body.token) {
         res.json({ notAllowed: true });
         return;
     }
-    const { token } = matchedData(req);
+    const token = req.query.token ? req.query.token : req.body.token;
+
+    if (token == '') {
+        res.json({ notAllowed: true });
+        return;
+    }
+    
     const user = await User.findOne({ token });
     if (!user) {
         res.status(401)
