@@ -21,7 +21,7 @@ router.post('/user/login', AuthValidator.signin, AuthController.signin);
 router.post('/user/signup', AuthValidator.signup, AuthController.signup);
 
 router.get('/user/me', AuthValidator.info, Auth.privateRoute, UserController.info);
-router.put('/user/me', Auth.privateRoute, UserController.editAction);
+router.put('/user/me', UserValidator.editAction, Auth.privateRoute, UserController.editAction);
 
 router.get('/categories', AdsController.getCategories);
 

@@ -1,4 +1,7 @@
 import { Request, Response } from "express";
+import mongoose from "mongoose";
+import { matchedData, validationResult } from "express-validator";
+import bcrypt from 'bcrypt';
 import State from "../models/State";
 import User from "../models/User";
 import Ad from "../models/Ad";
@@ -76,5 +79,49 @@ export const info = async (req: Request, res: Response) => {
 }
 
 export const editAction = async (req: Request, res: Response) => {
-    res.json({ updated: 'ok' });
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        res.json({ error: errors.mapped() });
+        return;
+    }
+    const { name, email, state, password, newPassword, token } = matchedData(req);
+
+    const newUserInfo: {name?: string, email?: string, state?: string, passwordHash?: string} = {};
+
+    const user = await User.findOne({ token });
+
+    const match = await bcrypt.compare(password, user?.passwordHash as string);
+
+    if (!match) {
+        res.json({ error: "Senha incorreta." });
+        return;
+    }
+
+    if (name) {
+        newUserInfo.name = name;
+    }
+    if (email) {
+        newUserInfo.email = email;
+    }
+    if (state) {
+        if (!mongoose.Types.ObjectId.isValid(state)) {
+            res.json({ error: "Código de estado inválido." });
+            return;
+        }
+
+        const checkState = await State.findById(state);
+
+        if (!checkState) {
+            res.json({ error: "Estado Inválido." });
+            return;
+        }
+        newUserInfo.state = state;
+    }
+    if (newPassword) {
+        newUserInfo.passwordHash = await bcrypt.hash(newPassword, 12);
+    }
+
+    await User.findOneAndUpdate({ token }, newUserInfo);    
+
+    res.json({ updated: true });
 }
