@@ -1,6 +1,6 @@
 import mongoose, { Schema, Types } from "mongoose";
 
-type Image = {name: String; default: Boolean}
+type Image = {url: string; default: boolean}
 export interface AdInstance {
     _id: Types.ObjectId;
     userId: string;

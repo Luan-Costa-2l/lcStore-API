@@ -1,10 +1,11 @@
 import { Request, Response } from "express";
-import { isValidObjectId } from "mongoose";
+import mongoose, { isValidObjectId } from "mongoose";
 import dotenv from 'dotenv';
 import Ad, { AdInstance } from '../models/Ad';
 import Category, { CategoryInstance } from "../models/Category";
 import State from "../models/State";
 import User from "../models/User";
+import { matchedData, validationResult } from "express-validator";
 dotenv.config();
 
 export const getCategories = async (req: Request, res: Response) => {
@@ -74,7 +75,98 @@ export const getList = async (req: Request, res: Response) => {
 }
 
 export const addAction = async (req: Request, res: Response) => {
-    res.json({ addAction: 'ok' });
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        res.json({
+            error: errors.mapped()
+        });
+        return;
+    }
+
+    const { token, category, title, price, priceNegotiable, description } = matchedData(req);
+
+    if (!mongoose.Types.ObjectId.isValid(category)) {
+        res.json({
+            error: { category: { msg: "Código de categoria inválido." } }
+        });
+        return;
+    }
+
+    const checkCategory = await Category.findById(category);
+
+    if (!checkCategory) {
+        res.json({
+            error: { category: { msg: "Categoria inválida." } }
+        });
+        return;
+    }
+
+    const user = await User.findOne({ token });
+
+    if (!user) {
+        res.json({
+            error: { login: { msg: "Token inválido, faça login novamente." } }
+        });
+        return;
+    }
+
+    const newAd = new Ad();
+    newAd.userId = user._id.toString();
+    newAd.state = user.state;
+    newAd.category = category;
+    newAd.dateCreated = new Date();
+    newAd.title = title;
+    newAd.price = parseFloat(price as string);
+    newAd.priceNegotiable = priceNegotiable == 'true' ? true : false;
+    newAd.description = description;
+    newAd.views = 0;
+    newAd.status = true;
+
+    let images = [];
+
+    if (!req.files) {
+        res.json({
+            error: { img: { msg: "Adicione pelo menos uma imagem." }}
+        });
+        return;
+    }
+
+    if (!Array.isArray(req.files)) {
+        res.json({
+            error: { img: { msg: "Formato de arquivo inválido." }}
+        });
+        console.log('The files doesn\'t are an array, vide ads controller');
+        return;
+    }
+
+    if (req.files.length === 1) {
+        images.push({
+            url: `${process.env.NODE_BASE}/media/${req.files[0].filename}`,
+            default: true
+        });
+    }
+
+    if (req.files.length > 1) {
+        for(let index = 0; req.files.length > index; index++) {
+            if (index === 0) {
+                images.push({
+                    url: `${process.env.NODE_BASE}/media/${req.files[index].filename}`,
+                    default: true
+                });  
+            } else {
+                images.push({
+                    url: `${process.env.NODE_BASE}/media/${req.files[index].filename}`,
+                    default: false
+                });  
+            }
+        }
+    }
+
+    newAd.images = images;
+
+    await newAd.save();
+
+    res.json({ id: newAd._id });
 }
 
 export const getItem = async (req: Request, res: Response) => {
