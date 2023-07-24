@@ -57,7 +57,7 @@ export const info = async (req: Request, res: Response) => {
 
     const adList = ads.map(ad => {
         const defaultImage = ad.images.find(img => img.default);
-        const image = `${process.env.NODE_BASE}/media/${defaultImage ? defaultImage.name :'default'}.png`;
+        const image = defaultImage ? defaultImage.url : 'http://www.defaultImage.com';
         return {
             id: ad._id.toString(),
             title: ad.title,

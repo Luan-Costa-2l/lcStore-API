@@ -57,9 +57,9 @@ export const getList = async (req: Request, res: Response) => {
         let image = '';
         const defaultImage = ad.images.find(image => image.default);
         if (defaultImage) {
-            image = `${process.env.NODE_BASE}/media/${defaultImage.name}.png`;
+            image = `${process.env.NODE_BASE}/media/${defaultImage.url}.png`;
         } else {
-            image = `${process.env.NODE_BASE}/media/${ad.images[0].name ?? 'default'}.png`;
+            image = `${process.env.NODE_BASE}/media/${ad.images[0].url ?? 'default'}.png`;
         }
         ads.push({
             id: ad._id,
@@ -102,7 +102,7 @@ export const getItem = async (req: Request, res: Response) => {
     ad.views++;
     await ad.save();
 
-    const images = ad.images.map(image => `${process.env.NODE_BASE}/media/${image.name}.png`);
+    const images = ad.images.map(image => image.url);
 
     const userInfo = await User.findById(ad.userId).exec();
     const stateInfo = await State.findById(ad.state).exec();
@@ -117,7 +117,7 @@ export const getItem = async (req: Request, res: Response) => {
                 let image = `${process.env.NODE_BASE}/media/default.png`;
                 const defaultImage = otherAd.images.find(image => image.default);
                 if (defaultImage) {
-                    image = `${process.env.NODE_BASE}/media/${defaultImage.name}.png`;
+                    image = defaultImage.url;
                 }
                 others.push({
                     id: otherAd._id.toString(),

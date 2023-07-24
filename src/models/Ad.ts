@@ -3,7 +3,7 @@ import mongoose, { Schema, Types } from "mongoose";
 type Image = {name: String; default: Boolean}
 export interface AdInstance {
     _id: Types.ObjectId;
-    userId: Types.ObjectId;
+    userId: string;
     state: string;
     category: string;
     images: Image[];
@@ -13,7 +13,7 @@ export interface AdInstance {
     priceNegotiable: boolean;
     description: string;
     views: number;
-    status: string;
+    status: boolean;
 }
 
 const AdSchema = new Schema<AdInstance>({
