@@ -43,3 +43,57 @@ export const addad = checkSchema({
         }
     }
 });
+
+export const editAd = checkSchema({
+    token: {
+        notEmpty: {
+            errorMessage: "Token inexistente, faça login novamente."
+        }
+    },
+    id: {
+        notEmpty: {
+            errorMessage: "Id do anúncio inexistente."
+        }
+    },
+    category: {
+        optional: true,
+        notEmpty: {
+            errorMessage: "O campo categoria não pode estar vazio."
+        }
+    },
+    title: {
+        optional: true,
+        notEmpty: {
+            errorMessage: "O campo titulo não pode estar vazio."
+        },
+        isLength: {
+            options: { min: 3 },
+            errorMessage: "O titulo precisa ter pelo menos 3 caracteres."
+        }
+    },
+    price: {
+        optional: true,
+        notEmpty: {
+            errorMessage: "O campo preço não pode estar vazio."
+        }
+    },
+    priceNegotiable: {
+        optional: true,
+        notEmpty: {
+            errorMessage: "O campo preço negociável não pode estar vazio."
+        },
+        isBoolean: {
+            errorMessage: "O campo preço negociável precisa ser verdadeiro ou falso."
+        }
+    },
+    description: {
+        optional: true,
+        notEmpty: {
+            errorMessage: "O anúncio precisa de uma descrição."
+        },
+        isLength: {
+            options: { min: 10 },
+            errorMessage: "A descrição precisa ter pelo menos 10 caracteres."
+        }
+    }
+});

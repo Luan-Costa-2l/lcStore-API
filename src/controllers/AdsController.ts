@@ -251,5 +251,92 @@ export const getItem = async (req: Request, res: Response) => {
 }
 
 export const editAction = async (req: Request, res: Response) => {
-    res.json({ editAction: 'atualizou!' });
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        res.json({ error: errors.mapped() });
+        return;
+    }
+
+    const { id, title, category, price, priceNegotiable, description } = matchedData(req);
+
+    const ad = await Ad.findById(id);
+
+    if (!ad) {
+        res.json({
+            error: { id: { msg: "Nenhum anúncio encontrado com esse id." }}
+        });
+        return;
+    }
+
+    if (title) {
+        ad.title = title;
+    }
+
+    if (category) {
+        if (!mongoose.Types.ObjectId.isValid(category)) {
+            res.json({
+                error: { category: { msg: "Código da categoria inválido." }}
+            });
+            return;
+        }
+        const checkCategory = await Category.findById(category);
+        if (!checkCategory) {
+            res.json({
+                error: { category: { msg: "Categoria inválida." }}
+            });
+            return;
+        }
+
+        ad.category = category;
+    }
+
+    if (!isNaN(parseFloat(price))) {
+        ad.price = priceNegotiable == 'true' ? 0 : parseFloat(price);
+    }
+
+    if (priceNegotiable) {
+        ad.priceNegotiable = (priceNegotiable == 'true' || parseFloat(price) == 0) ? true : false;
+    }
+
+    if (description) {
+        ad.description = description;
+    }
+
+    if (req.files && Array.isArray(req.files) && req.files.length > 0) {
+        let images = [];
+
+        if (req.files.length === 1) {
+            const file = req.files[0];
+            const url = await imageSharp(file);
+
+            images.push({
+                url,
+                default: true
+            });
+        }
+
+        if (req.files.length > 1) {
+            for(let index = 0; req.files.length > index; index++) {
+                const file = req.files[index];
+                const url = await imageSharp(file);
+                if (index === 0) {
+                    images.push({
+                        url,
+                        default: true
+                    });  
+                } else {
+                    images.push({
+                        url,
+                        default: false
+                    });  
+                }
+            }
+        }
+
+        ad.images = images;
+    }
+
+    await ad.save();
+
+    res.json({ ad });
 }

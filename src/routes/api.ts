@@ -31,6 +31,6 @@ router.get('/categories', AdsController.getCategories);
 router.get('/ad/list', AdsController.getList);
 router.post('/ad/add', upload.array('img', 5), AdValidator.addad, Auth.privateRoute, AdsController.addAction);
 router.get('/ad/:id', AdsController.getItem);
-router.post('/ad/:id', Auth.privateRoute, AdsController.editAction);
+router.post('/ad/:id', upload.array('img', 5), AdValidator.editAd, Auth.privateRoute, AdsController.editAction);
 
 export default router;
