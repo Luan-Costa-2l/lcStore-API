@@ -8,6 +8,7 @@ import * as UserValidator from '../validators/UserValidator';
 import * as AdValidator from '../validators/AdValidator';
 
 import * as Auth from '../middlewares/Auth';
+import { upload } from "../middlewares/Upload";
 
 const router = Router();
 
@@ -28,7 +29,7 @@ router.put('/user/me', UserValidator.editAction, Auth.privateRoute, UserControll
 router.get('/categories', AdsController.getCategories);
 
 router.get('/ad/list', AdsController.getList);
-router.post('/ad/add', AdValidator.addad, Auth.privateRoute, AdsController.addAction);
+router.post('/ad/add', upload.array('img', 5), AdValidator.addad, Auth.privateRoute, AdsController.addAction);
 router.get('/ad/:id', AdsController.getItem);
 router.post('/ad/:id', Auth.privateRoute, AdsController.editAction);
 

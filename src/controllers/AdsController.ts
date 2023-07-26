@@ -1,11 +1,14 @@
 import { Request, Response } from "express";
 import mongoose, { isValidObjectId } from "mongoose";
+import { matchedData, validationResult } from "express-validator";
+import sharp from 'sharp';
 import dotenv from 'dotenv';
 import Ad, { AdInstance } from '../models/Ad';
 import Category, { CategoryInstance } from "../models/Category";
 import State from "../models/State";
 import User from "../models/User";
-import { matchedData, validationResult } from "express-validator";
+import path from "path";
+import { imageSharp } from "../middlewares/Upload";
 dotenv.config();
 
 export const getCategories = async (req: Request, res: Response) => {
@@ -140,22 +143,27 @@ export const addAction = async (req: Request, res: Response) => {
     }
 
     if (req.files.length === 1) {
+        const file = req.files[0];
+        const url = await imageSharp(file);
+
         images.push({
-            url: `${process.env.NODE_BASE}/media/${req.files[0].filename}`,
+            url,
             default: true
         });
     }
 
     if (req.files.length > 1) {
         for(let index = 0; req.files.length > index; index++) {
+            const file = req.files[index];
+            const url = await imageSharp(file);
             if (index === 0) {
                 images.push({
-                    url: `${process.env.NODE_BASE}/media/${req.files[index].filename}`,
+                    url,
                     default: true
                 });  
             } else {
                 images.push({
-                    url: `${process.env.NODE_BASE}/media/${req.files[index].filename}`,
+                    url,
                     default: false
                 });  
             }
@@ -165,8 +173,8 @@ export const addAction = async (req: Request, res: Response) => {
     newAd.images = images;
 
     await newAd.save();
-
-    res.json({ id: newAd._id });
+    
+    res.status(201).json({ id: newAd._id.toString() });
 }
 
 export const getItem = async (req: Request, res: Response) => {
