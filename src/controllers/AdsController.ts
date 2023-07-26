@@ -338,5 +338,5 @@ export const editAction = async (req: Request, res: Response) => {
 
     await ad.save();
 
-    res.json({ ad });
+    res.json({ updated: true });
 }
