@@ -6,7 +6,9 @@ import path from 'path';
 import mainRoutes from './routes/api'
 dotenv.config();
 
-mongoose.connect(process.env.NODE_DATABASE as string).catch(error => console.log(error));
+mongoose.connect(process.env.NODE_DATABASE as string, { authSource: "admin" })
+    .then(res => console.log("Connected with db!"))
+    .catch((error) => console.log((error as Error).message));
 
 const app = express();
 
