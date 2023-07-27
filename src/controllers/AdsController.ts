@@ -58,12 +58,12 @@ export const getList = async (req: Request, res: Response) => {
     let ads = [];
 
     for (let ad of adsData) {
-        let image = '';
+        let image = 'https://firebasestorage.googleapis.com/v0/b/lcstore-13d44.appspot.com/o/AdImages%2Fdefault.jpg?alt=media&token=e91ea05e-0e1e-450f-bcfa-44d77820bad2';
         const defaultImage = ad.images.find(image => image.default);
         if (defaultImage) {
-            image = `${process.env.NODE_BASE}/media/${defaultImage.url}.png`;
+            image = defaultImage.url;
         } else {
-            image = `${process.env.NODE_BASE}/media/${ad.images[0].url ?? 'default'}.png`;
+            image = ad.images[0].url;
         }
         ads.push({
             id: ad._id,
@@ -214,7 +214,7 @@ export const getItem = async (req: Request, res: Response) => {
 
         otherAds.forEach(otherAd => {
             if (otherAd._id.toString() != ad._id.toString()) {
-                let image = `${process.env.NODE_BASE}/media/default.png`;
+                let image = 'https://firebasestorage.googleapis.com/v0/b/lcstore-13d44.appspot.com/o/AdImages%2Fdefault.jpg?alt=media&token=e91ea05e-0e1e-450f-bcfa-44d77820bad2';
                 const defaultImage = otherAd.images.find(image => image.default);
                 if (defaultImage) {
                     image = defaultImage.url;
