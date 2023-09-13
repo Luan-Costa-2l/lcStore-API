@@ -23,7 +23,7 @@ export const info = async (req: Request, res: Response) => {
         return;
     }
 
-    const state = await State.findById(user._id.toString());
+    const state = await State.findById(user.state);
 
     const userId = user._id.toString();
     let filters: { 
