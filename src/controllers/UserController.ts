@@ -93,7 +93,7 @@ export const editAction = async (req: Request, res: Response) => {
     const match = await bcrypt.compare(password, user?.passwordHash as string);
 
     if (!match) {
-        res.json({ error: "Senha incorreta." });
+        res.json({ error: { password: { msg: "Senha incorreta." } } });
         return;
     }
 
@@ -105,14 +105,14 @@ export const editAction = async (req: Request, res: Response) => {
     }
     if (state) {
         if (!mongoose.Types.ObjectId.isValid(state)) {
-            res.json({ error: "Código de estado inválido." });
+            res.json({ error: { state: { msg: "Código de estado inválido." } } });
             return;
         }
 
         const checkState = await State.findById(state);
 
         if (!checkState) {
-            res.json({ error: "Estado Inválido." });
+            res.json({ error: { state: { msg: "Estado Inválido." } } });
             return;
         }
         newUserInfo.state = state;
